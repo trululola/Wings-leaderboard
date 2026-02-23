@@ -1,153 +1,173 @@
-/* REEMPLAZA TODO en style.css por este bloque */
-
-/* Reset / base */
+/* ================= RESET ================= */
 *{box-sizing:border-box}
 html,body{
   height:100%;
   margin:0;
-  font-family: "Inter","Helvetica Neue","Arial",sans-serif;
-  background:#081b0f; /* fallback */
+  font-family: "Inter", Arial, Helvetica, sans-serif;
+  background:#081b0f;
   color:#fff;
-  -webkit-font-smoothing:antialiased;
 }
 
-/* Fondo principal (usa tu bg.png) */
+/* ================= FONDO ================= */
 .screen{
   width:100vw;
   height:100vh;
-  background-image: url("bg.png");
-  background-repeat: no-repeat;
-  /* contain evita zoom exagerado; muestra la imagen completa dentro del viewport */
-  background-size: contain;
-  background-position: center;
+  background:url("bg.png") center/contain no-repeat;
   position:relative;
   overflow:hidden;
-  /* añadimos un padding-right para respetar personajes del lado derecho */
-  padding-right: 360px; /* ajusta si la imagen ocupa más/menos a la derecha */
 }
 
-/* PANEL del leaderboard: más estrecho y abajo, con sombra */
+/* ================= OVERLAY (contenedor) ================= */
+/* estrecho, centrado, y más arriba para que NO tape personajes */
+/* REEMPLAZA la regla .overlay actual con este bloque seguro */
 .overlay{
   position: absolute;
   left: 50%;
   transform: translateX(-50%);
-  bottom: 100px;           /* altura desde abajo */
-  width: 700px;            /* ancho reducido para no cubrir personajes */
-  max-height: 520px;       /* controla la altura visible */
-  padding: 22px;
-  border-radius: 14px;
-  background: linear-gradient(180deg, rgba(0,0,0,0.45), rgba(0,0,0,0.35));
+  top: 110px;
+
+  width: 720px;
+  max-width: 78vw;
+  height: 82vh;            /* ← altura fija para permitir scroll interno */
+
+  padding: 18px;
+  border-radius: 12px;
+
+  background: linear-gradient(180deg, rgba(0,0,0,0.45), rgba(0,0,0,0.30));
   backdrop-filter: blur(6px) saturate(1.05);
-  box-shadow: 0 25px 60px rgba(0,0,0,0.6);
+  box-shadow: 0 18px 40px rgba(0,0,0,0.55);
+
   display:flex;
   flex-direction:column;
-  gap:12px;
+  overflow:hidden;
 }
 
-/* Ocultar título porque está en la imagen */
+.board::-webkit-scrollbar{ width:10px; }
+
+.board::-webkit-scrollbar-thumb{
+  background: rgba(255,255,255,0.25);
+  border-radius:8px;
+}
+
+.board::-webkit-scrollbar-track{
+  background: transparent;
+}
+/* caja principal (tarjeta) */
+.panel{
+  width:100%;
+  background:#0b431b; /* verde oscuro */
+  border:4px solid rgba(255,255,255,0.92);
+  border-radius:8px;
+  box-shadow: 0 18px 40px rgba(0,0,0,0.5);
+  overflow:hidden;
+  display:flex;
+  flex-direction:column;
+}
+
+/* header oculto (si existe) */
 .header{ display:none; }
 
-/* El área de la lista (con scroll interno) */
+/* ================= BOARD: scroll interno con EXACTAMENTE 10 filas visibles =============== */
+/* calculado con row-height:56, gap:6, padding:8 => max-height = 56*10 + (9*6) + 16 = 630px */
 .board{
   display:flex;
   flex-direction:column;
   gap:10px;
   width:100%;
+
+  /* CLAVE */
   overflow-y:auto;
-  padding-right:6px; /* para evitar que el texto quede por debajo del scrollbar */
+  height:100%;
+  padding-right:8px;
 }
 
-/* scrollbar amigable (Webkit) */
-.board::-webkit-scrollbar{ width:12px; }
+/* ================= SCROLLBAR FINO ================= */
+.board::-webkit-scrollbar{ width:10px; }
+.board::-webkit-scrollbar-track{ background: rgba(0,0,0,0.08); border-radius:8px; }
 .board::-webkit-scrollbar-thumb{
-  background: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.03));
+  background: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(0,0,0,0.25));
   border-radius:8px;
-  border: 3px solid rgba(0,0,0,0.2);
+  border: 2px solid rgba(0,0,0,0.08);
 }
 
-/* filas */
+/* ================= FILA (compacta) ================= */
 .row{
   display:flex;
   align-items:center;
-  gap:14px;
-  padding:12px 16px;
-  border-radius:10px;
-  background: rgba(255,255,255,0.02);
-  transition: transform .12s ease, background .12s ease;
-  min-height:64px;
-}
-
-/* tamaño del cuadro del rank (más compacto) */
-.rank{
-  width:64px;
-  height:64px;
-  min-width:64px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  border-radius:10px;
-  background: linear-gradient(180deg,#ff7a00,#ff3d00);
-  font-size:22px;
-  font-weight:900;
-  color:#fff;
-  box-shadow: 0 6px 18px rgba(0,0,0,0.45);
-}
-
-/* nombre: más legible y con menos espacio */
-.name{
-  font-size:20px;
+  gap:12px;
+  padding:10px 16px;
+  min-height:56px;     /* altura fija por fila */
+  border-radius:6px;
   font-weight:800;
-  letter-spacing:0.2px;
-  color:#ffffff;
+  overflow:hidden;
+}
+
+/* separador sutil (para look "tarjeta") */
+.row + .row { box-shadow: inset 0 1px 0 rgba(255,255,255,0.03); }
+
+/* ================= COLUMNA RANK / NAME / SCORE ================= */
+.rank{
+  width:48px;
+  min-width:48px;
+  text-align:center;
+  font-size:20px;
+  font-weight:900;
+}
+
+.name{
+  flex:1;
+  font-size:18px;
   white-space:nowrap;
   overflow:hidden;
   text-overflow:ellipsis;
-  max-width:420px;
+  padding-left:6px;
 }
 
-/* score a la derecha */
 .score{
   margin-left:auto;
   font-size:20px;
   font-weight:900;
-  min-width:140px;
+  min-width:110px;
   text-align:right;
 }
 
-/* estilo para el primer puesto: dorado más fino */
-.row:first-child .rank{
-  background: linear-gradient(180deg,#ffd700,#ffb703);
-  color:#111;
-  transform: scale(1.02);
+/* ================= COLORES ================= */
+/* Oro, Plata, Bronce, Restantes (solidos) */
+.board .row:nth-child(1){
+  background:#ffd83d; color:#111;
+  box-shadow: 0 6px 12px rgba(0,0,0,0.25);
+}
+.board .row:nth-child(2){
+  background:#e9e9e9; color:#111;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.18);
+}
+.board .row:nth-child(3){
+  background:#f28c1c; color:#111;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.18);
+}
+.board .row:nth-child(n+4){
+  background:#1f7a2f; color:#fff;
 }
 
-/* hover sutil para PC (no molesta en TV) */
-.row:hover{
-  transform: translateY(-4px);
-  background: rgba(255,255,255,0.035);
-}
-
-/* footer (hora) */
+/* ================= FOOTER ================= */
 .footer{
-  margin-top:4px;
-  font-size:12px;
-  opacity:0.9;
-  text-align:right;
+  text-align:center;
+  font-size:13px;
+  color:rgba(255,255,255,0.92);
+  padding:8px 0;
+  background:transparent;
 }
 
-/* Mensajes de error / cargando */
-.error{
-  padding:12px;
-  border-radius:10px;
-  background: rgba(255,20,20,0.03);
-  color:#ffc6c6;
-  font-weight:700;
+/* ================= MEDIA ================= */
+@media (max-width:1200px){
+  .overlay{ width:86%; top:90px; }
+  .panel{ border-width:3px; }
+  .name{ font-size:16px; }
+  .score{ font-size:18px; min-width:90px; }
+  .rank{ width:44px; font-size:18px; min-width:44px; }
+}
+@media (max-width:800px){
+  .overlay{ top:70px; width:92%; }
+  .row{ padding:8px 12px; min-height:50px; }
 }
 
-/* Media queries para pantallas más pequeñas o ajustes */
-@media (max-width: 1400px){
-  .overlay{ width: 82%; max-height: 60vh; bottom: 60px; padding:16px; }
-  .name{ font-size:18px; }
-  .score{ font-size:18px; }
-  .rank{ width:56px; height:56px; font-size:18px; }
-}
