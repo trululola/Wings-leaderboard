@@ -82,7 +82,7 @@ html,body{
   align-items:center;
   justify-content:center;
   font-weight:900;
-  font-size:32px;
+  font-size:42px;
   color:#ffefea;
   background: linear-gradient(180deg,#1f6b2e,#155022);
   border-radius:8px;
@@ -92,7 +92,7 @@ html,body{
 /* Nombre: crece y puede recortarse si es necesario */
 .name{
   flex:1;
-  font-size:28px;
+  font-size:52px;
   font-weight:800;
   letter-spacing:0.2px;
   color:#ffffff;
@@ -105,7 +105,7 @@ html,body{
 /* Score a la derecha */
 .score{
   margin-left:auto;
-  font-size:28px;
+  font-size:38px;
   font-weight:900;
   min-width:160px;
   text-align:right;
