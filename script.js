@@ -36,13 +36,11 @@ async function loadLeaderboard() {
 loadLeaderboard();
 setInterval(loadLeaderboard, 10000);
 // ===== FULLSCREEN DOBLE CLICK =====
-document.addEventListener("dblclick", () => {
-
+// ===== FULLSCREEN ON DOUBLE CLICK =====
+document.addEventListener("dblclick", async () => {
     if (!document.fullscreenElement) {
-      document.documentElement.requestFullscreen();
+      await document.documentElement.requestFullscreen();
     } else {
-      document.exitFullscreen();
+      await document.exitFullscreen();
     }
-  
-  });
-  
+    
