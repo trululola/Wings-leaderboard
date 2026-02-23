@@ -1,176 +1,173 @@
-/* ---------- Nuevo style.css (reemplazar todo) ---------- */
-
-/* Reset / base */
+/* ================= RESET ================= */
 *{box-sizing:border-box}
 html,body{
   height:100%;
   margin:0;
-  font-family: Arial, Helvetica, sans-serif;
-  background:#000;
+  font-family: "Inter", Arial, Helvetica, sans-serif;
+  background:#081b0f;
   color:#fff;
-  -webkit-font-smoothing:antialiased;
 }
 
-/* Contenedor principal: fondo en bg.png (no lo tapa nada) */
+/* ================= FONDO ================= */
 .screen{
   width:100vw;
   height:100vh;
-  background: url("bg.png") center/contain no-repeat;
-  background-color: #000; /* fallback */
-  position:relative; /* referencia para position absolute del panel */
+  background:url("bg.png") center/contain no-repeat;
+  position:relative;
   overflow:hidden;
-  padding:0;
 }
 
-/* Variables fáciles de ajustar */
-:root{
-  --row-h: 72px;          /* altura de cada fila (ajusta para filas más grandes) */
-  --rows-visible: 10;     /* filas que queremos que quepan sin scroll */
-  --panel-width: 900px;   /* ancho del panel */
-  --panel-top: 120px;     /* distancia desde arriba (ajusta para moverlo arriba/abajo) */
-  --panel-padding: 18px;
+/* ================= OVERLAY (contenedor) ================= */
+/* estrecho, centrado, y más arriba para que NO tape personajes */
+/* REEMPLAZA la regla .overlay actual con este bloque seguro */
+.overlay{
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  top: 110px;
+
+  width: 720px;
+  max-width: 78vw;
+  height: 92vh;            /* ← altura fija para permitir scroll interno */
+
+  padding: 18px;
+  border-radius: 12px;
+
+  background: linear-gradient(180deg, rgba(0,0,0,0.45), rgba(0,0,0,0.30));
+  backdrop-filter: blur(6px) saturate(1.05);
+  box-shadow: 0 18px 40px rgba(0,0,0,0.55);
+
+  display:flex;
+  flex-direction:column;
+  overflow:hidden;
 }
 
-/* PANEL principal — ahora usamos top en lugar de bottom */
+.board::-webkit-scrollbar{ width:10px; }
+
+.board::-webkit-scrollbar-thumb{
+  background: rgba(255,255,255,0.25);
+  border-radius:8px;
+}
+
+.board::-webkit-scrollbar-track{
+  background: transparent;
+}
+/* caja principal (tarjeta) */
 .panel{
-  position:absolute;
-  left:50%;
-  transform:translateX(-50%);
-  top: var(--panel-top);
-  width: var(--panel-width);
-  /* calculamos la altura para que entren --rows-visible filas + espacio para header/footer */
-  max-height: calc( (var(--row-h) * var(--rows-visible)) + 120px );
-  height: auto;
-  padding: var(--panel-padding);
-  border: 4px solid rgba(255,0,0,0.95);
-  background: rgba(0,0,0,0.55);
-  backdrop-filter: blur(0.5px);
-  border-radius: 8px;
-  overflow-y: auto; /* scroll sólo si la pantalla es más pequeña */
-  box-shadow: 0 18px 40px rgba(0,0,0,0.6);
+  width:100%;
+  background:#0b431b; /* verde oscuro */
+  border:4px solid rgba(255,255,255,0.92);
+  border-radius:8px;
+  box-shadow: 0 18px 40px rgba(0,0,0,0.5);
+  overflow:hidden;
+  display:flex;
+  flex-direction:column;
 }
 
-/* Si quieres que el panel suba más en pantallas muy grandes, ajusta top con media queries abajo */
+/* header oculto (si existe) */
+.header{ display:none; }
 
-/* Área que contiene las filas */
+/* ================= BOARD: scroll interno con EXACTAMENTE 10 filas visibles =============== */
+/* calculado con row-height:56, gap:6, padding:8 => max-height = 56*10 + (9*6) + 16 = 630px */
 .board{
   display:flex;
   flex-direction:column;
   gap:10px;
   width:100%;
-  padding-right:8px; /* evita que texto se oculte por la scrollbar */
+
+  /* CLAVE */
+  overflow-y:auto;
+  height:100%;
+  padding-right:8px;
 }
 
-/* estilo de cada fila */
+/* ================= SCROLLBAR FINO ================= */
+.board::-webkit-scrollbar{ width:10px; }
+.board::-webkit-scrollbar-track{ background: rgba(0,0,0,0.08); border-radius:8px; }
+.board::-webkit-scrollbar-thumb{
+  background: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(0,0,0,0.25));
+  border-radius:8px;
+  border: 2px solid rgba(0,0,0,0.08);
+}
+
+/* ================= FILA (compacta) ================= */
 .row{
   display:flex;
   align-items:center;
-  gap:18px;
-  padding: 12px 16px;
-  min-height: var(--row-h);
-  background: rgba(255,255,255,0.03);
-  border-radius:8px;
-  border-bottom: 2px solid rgba(0,0,0,0.12);
+  gap:12px;
+  padding:10px 16px;
+  min-height:56px;     /* altura fija por fila */
+  border-radius:6px;
+  font-weight:800;
+  overflow:hidden;
 }
 
-/* Rank (número grande a la izquierda) */
+/* separador sutil (para look "tarjeta") */
+.row + .row { box-shadow: inset 0 1px 0 rgba(255,255,255,0.03); }
+
+/* ================= COLUMNA RANK / NAME / SCORE ================= */
 .rank{
-  width:64px;
-  min-width:64px;
-  height:64px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
+  width:48px;
+  min-width:48px;
+  text-align:center;
+  font-size:45px;
   font-weight:900;
-  font-size:42px;
-  color:#ffefea;
-  background: linear-gradient(180deg,#1f6b2e,#155022);
-  border-radius:8px;
-  box-shadow: 0 6px 12px rgba(0,0,0,0.35);
 }
 
-/* Nombre: crece y puede recortarse si es necesario */
 .name{
   flex:1;
-  font-size:52px;
-  font-weight:800;
-  letter-spacing:0.2px;
-  color:#ffffff;
+  font-size:40px;
   white-space:nowrap;
   overflow:hidden;
   text-overflow:ellipsis;
   padding-left:6px;
 }
 
-/* Score a la derecha */
 .score{
   margin-left:auto;
-  font-size:38px;
+  font-size:40px;
   font-weight:900;
-  min-width:160px;
+  min-width:110px;
   text-align:right;
-  color:#fff;
 }
 
-/* Primer puesto distinto */
-.row:first-child .rank{
-  background: linear-gradient(180deg,#ffd700,#ffb703);
-  color:#111;
-  transform: scale(1.03);
+/* ================= COLORES ================= */
+/* Oro, Plata, Bronce, Restantes (solidos) */
+.board .row:nth-child(1){
+  background:#ffd83d; color:#111;
+  box-shadow: 0 6px 12px rgba(0,0,0,0.25);
+}
+.board .row:nth-child(2){
+  background:#e9e9e9; color:#111;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.18);
+}
+.board .row:nth-child(3){
+  background:#f28c1c; color:#111;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.18);
+}
+.board .row:nth-child(n+4){
+  background:#1f7a2f; color:#fff;
 }
 
-/* Hover sutil (no molesta en TV) */
-.row:hover{
-  transform: translateY(-3px);
-  background: rgba(255,255,255,0.035);
-}
-
-/* Footer (hora / mensaje) */
+/* ================= FOOTER ================= */
 .footer{
-  margin-top:10px;
-  font-size:14px;
-  opacity:0.95;
   text-align:center;
-  color: #eaeaea;
+  font-size:13px;
+  color:rgba(255,255,255,0.92);
+  padding:8px 0;
+  background:transparent;
 }
 
-/* Mensajes de error / cargando */
-.error{
-  padding:12px;
-  border-radius:10px;
-  background: rgba(255,20,20,0.03);
-  color:#ffc6c6;
-  font-weight:700;
+/* ================= MEDIA ================= */
+@media (max-width:1200px){
+  .overlay{ width:86%; top:90px; }
+  .panel{ border-width:3px; }
+  .name{ font-size:16px; }
+  .score{ font-size:18px; min-width:90px; }
+  .rank{ width:44px; font-size:18px; min-width:44px; }
+}
+@media (max-width:800px){
+  .overlay{ top:70px; width:92%; }
+  .row{ padding:8px 12px; min-height:50px; }
 }
 
-/* Scrollbar más discreto (webkit) */
-.panel::-webkit-scrollbar{ width:12px; }
-.panel::-webkit-scrollbar-thumb{
-  background: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.03));
-  border-radius:8px;
-  border: 3px solid rgba(0,0,0,0.2);
-}
-
-/* MEDIA QUERIES — más grande en pantallas grandes (TVs) */
-@media (min-width:1400px){
-  :root{
-    --row-h: 88px;
-    --panel-width: 1100px;
-    --panel-top: 100px;
-  }
-  .name{ font-size:34px; }
-  .score{ font-size:34px; min-width:200px; }
-  .rank{ font-size:38px; width:72px; min-width:72px; height:72px; }
-}
-
-/* Ajustes para pantallas pequeñas para evitar overflow */
-@media (max-width:1000px){
-  :root{
-    --panel-width: 92%;
-    --row-h: 64px;
-    --rows-visible: 6; /* en móvil dejamos menos visibles */
-  }
-  .name{ font-size:18px; }
-  .score{ font-size:18px; min-width:110px; }
-  .rank{ font-size:20px; width:44px; min-width:44px; height:44px; }
-}
