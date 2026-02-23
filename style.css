@@ -70,7 +70,7 @@ html,body{
 .row{
   display:flex;
   align-items:center;
-  gap:12px;
+  gap:20px;
   padding:10px 16px;
   min-height:56px;
   border-radius:6px;
