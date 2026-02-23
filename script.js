@@ -35,123 +35,90 @@ async function loadLeaderboard() {
 
 loadLeaderboard();
 setInterval(loadLeaderboard, 10000);
-// ======= FULLSCREEN + DEBUG (pegar al final de script.js) =======
-
-/*
-  Requisitos:
-  - Servir la página por HTTP(S) o localhost (no file://)
-  - Abrir DevTools (F12) para ver logs si no funciona
-*/
-
+// ======= FULLSCREEN + DEBUG (robusto) =======
 (function(){
-    // URL friendly check
-    const isFile = location.protocol === "file:";
-    if (isFile) {
-      console.warn("WARNING: página abierta con file:// — el fullscreen puede estar bloqueado. Sirve la página con Live Server o python -m http.server y prueba en http://localhost:5500");
+    function log(...args){ console.log('[LB-FS]', ...args); }
+  
+    if(location.protocol === 'file:'){
+      console.warn('[LB-FS] Page opened via file:// — fullscreen may be blocked. Serve locally (python -m http.server) or use GitHub Pages.');
     }
   
-    // Debug helper
-    function log(...args){ console.log("[LB-FS]", ...args); }
-  
-    // Try to request fullscreen on the element passed (default: document.documentElement)
     async function enterFullscreen(target = document.documentElement){
       try{
-        if (!target) throw new Error("no target element");
-        if (document.fullscreenElement) {
-          log("Ya en fullscreen:", document.fullscreenElement);
+        if(document.fullscreenElement){
+          log('already fullscreen');
           return;
         }
-        log("Solicitando fullscreen para", target);
-        await target.requestFullscreen();
-        log("Fullscreen activado");
+        log('requestFullscreen on', target);
+        await (target.requestFullscreen ? target.requestFullscreen() : Promise.reject(new Error('requestFullscreen not supported')));
+        log('fullscreen ok');
       }catch(err){
-        console.error("[LB-FS] Error al pedir fullscreen:", err);
+        console.error('[LB-FS] enter error', err);
+        // show a tiny on-screen message to the user
+        if(!document.getElementById('lb-fs-err')){
+          const msg = document.createElement('div');
+          msg.id = 'lb-fs-err';
+          msg.textContent = 'Fullscreen blocked — mira la consola.';
+          Object.assign(msg.style, { position:'fixed', left:12, top:12, zIndex:999999, background:'rgba(0,0,0,.7)', color:'#fff', padding:'8px 10px', borderRadius:6 });
+          document.body.appendChild(msg);
+          setTimeout(()=>msg.remove(), 5000);
+        }
       }
     }
   
     async function exitFullscreen(){
-      try{
-        if (!document.fullscreenElement) {
-          log("No hay fullscreen activo");
-          return;
-        }
-        await document.exitFullscreen();
-        log("Fullscreen salido");
-      }catch(err){
-        console.error("[LB-FS] Error al salir de fullscreen:", err);
-      }
+      try{ if(!document.fullscreenElement) return; await document.exitFullscreen(); }catch(e){ console.error('[LB-FS] exit error', e); }
     }
   
-    // Toggle
-    async function toggleFullscreen(){
-      if (document.fullscreenElement) await exitFullscreen();
+    async function toggle(){
+      if(document.fullscreenElement) await exitFullscreen();
       else await enterFullscreen();
     }
   
-    // Attach dblclick to whole document (works on clicks anywhere)
-    document.addEventListener("dblclick", async (ev) => {
-      log("dblclick event fired (target):", ev.target);
-      await toggleFullscreen();
-    });
+    // Use capture:true so elements that call stopPropagation() won't block us
+    document.addEventListener('dblclick', async (ev) => {
+      log('dblclick captured target=', ev.target);
+      await toggle();
+    }, { capture: true, passive: true });
   
-    // Fallback: add a small visible button (bottom-right) that force fullscreen on click.
-    // Useful para debug y para usuarios que no consiguen el dblclick.
-    const fsButtonId = "lb-fullscreen-btn";
-    if (!document.getElementById(fsButtonId)){
-      const btn = document.createElement("button");
+    // also attach to window as backup
+    window.addEventListener('dblclick', async (ev) => {
+      log('window dblclick target=', ev.target);
+      await toggle();
+    }, { passive: true });
+  
+    // Fallback button for manual test (always visible)
+    const fsButtonId = 'lb-fullscreen-btn';
+    if(!document.getElementById(fsButtonId)){
+      const btn = document.createElement('button');
       btn.id = fsButtonId;
-      btn.textContent = "FULLSCREEN";
+      btn.textContent = 'FULLSCREEN';
       Object.assign(btn.style, {
-        position: "fixed",
-        right: "12px",
-        bottom: "12px",
-        zIndex: 99999,
-        padding: "8px 12px",
-        borderRadius: "8px",
-        border: "none",
-        background: "rgba(0,0,0,0.55)",
-        color: "#fff",
-        fontWeight: 700,
-        cursor: "pointer",
-        boxShadow: "0 6px 18px rgba(0,0,0,0.4)"
+        position: 'fixed', right: '12px', bottom: '12px', zIndex: 999999,
+        padding: '8px 12px', borderRadius: '8px', border: 'none',
+        background: 'rgba(0,0,0,0.6)', color: '#fff', fontWeight: 700, cursor: 'pointer'
       });
-      btn.title = "Click para fullscreen (fallback). También funciona doble-click en la pantalla.";
-      btn.addEventListener("click", async (e) => {
+      btn.title = 'Click para fullscreen (fallback)';
+      btn.addEventListener('click', async (e) => {
         e.stopPropagation();
-        log("Botón fullscreen click");
-        await toggleFullscreen();
+        log('fs button click');
+        await toggle();
       });
       document.body.appendChild(btn);
     }
   
-    // Optional: hide cursor when fullscreen
-    document.addEventListener("fullscreenchange", () => {
-      if (document.fullscreenElement) {
-        document.documentElement.classList.add("lb-fullscreen");
-        log("fullscreenchange: ON");
-        // hide the button slightly (still clickable with mouse)
-        const b = document.getElementById(fsButtonId);
-        if (b) b.style.opacity = "0.5";
-      } else {
-        document.documentElement.classList.remove("lb-fullscreen");
-        log("fullscreenchange: OFF");
-        const b = document.getElementById(fsButtonId);
-        if (b) b.style.opacity = "1";
-      }
-    });
-  
-    // Add CSS for lb-fullscreen to hide cursor (put this in CSS if you prefer)
-    const styleId = "lb-fullscreen-style";
-    if (!document.getElementById(styleId)){
-      const s = document.createElement("style");
-      s.id = styleId;
-      s.textContent = `
-        .lb-fullscreen { cursor: none !important; }
-        #${fsButtonId} { transition: opacity .2s ease; }
-      `;
+    // Add small style to hide cursor when fullscreen (optional)
+    const styleId = 'lb-fs-style';
+    if(!document.getElementById(styleId)){
+      const s = document.createElement('style'); s.id = styleId;
+      s.textContent = `.lb-fullscreen { cursor: none !important } #${fsButtonId} { transition: opacity .2s }`;
       document.head.appendChild(s);
     }
+    document.addEventListener('fullscreenchange', ()=> {
+      if(document.fullscreenElement) document.documentElement.classList.add('lb-fullscreen');
+      else document.documentElement.classList.remove('lb-fullscreen');
+    });
   
-    log("Fullscreen helper installed. dblclick anywhere or press the FULLSCREEN button.");
+    log('Fullscreen helper installed — double-click or press the FULLSCREEN button.');
   })();
   
