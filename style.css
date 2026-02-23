@@ -18,15 +18,14 @@ html,body{
   overflow:hidden;
 }
 
-/* CONTENEDOR GENERAL */
 .overlay{
   position:absolute;
   left:50%;
   transform:translateX(-50%);
-  top:110px;
-  width:820px;            /* ancho real equilibrado */
+  top:10vh;
+  width:52vw;        /* ← AHORA escala con el tamaño de la TV */
+  max-width:1100px;  /* seguridad por si alguien abre en laptop */
 }
-
 /* PANEL */
 .panel{
   width:100%;             /* 🔴 importante: NO 130% */
@@ -43,12 +42,11 @@ html,body{
   flex-direction:column;
 }
 
-/* FILAS */
 .row{
   display:flex;
   align-items:center;
-  padding:18px 24px;      /* altura perfecta para 10 filas */
-  height:78px;            /* 🔴 controla cuántas caben */
+  padding:1.6vh 2vw;
+  height:8.2vh;      /* altura relativa a pantalla */
   font-weight:900;
 }
 
